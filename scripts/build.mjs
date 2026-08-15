@@ -23,7 +23,6 @@ const options = {
   // silently producing a bundle that breaks under osascript at runtime.
   platform: 'neutral',
   target: 'es2021',
-  banner: { js: '#!/usr/bin/osascript -l JavaScript' },
   logOverride: { 'unsupported-require-call': 'error' },
 };
 

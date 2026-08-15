@@ -10,7 +10,7 @@ export function shell(cmd: string): string {
 }
 
 export function homeDir(): string {
-  return shell('echo $HOME');
+  return getEnvVar('HOME');
 }
 
 /**

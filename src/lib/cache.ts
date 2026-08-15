@@ -9,33 +9,43 @@ function cacheDir(): string {
 
 function readCacheFile<T>(key: string): CacheEntry<T> | null {
   try {
-    const raw = shell(`cat "${cacheDir()}/${key}.json" 2>/dev/null`);
-    if (!raw) return null;
+    ObjC.import('Foundation');
+    const path = `${cacheDir()}/${key}.json`;
+    const data = $.NSData.dataWithContentsOfFile($(path));
+    if (!data || !data.length) return null;
+    const str = $.NSString.alloc.initWithDataEncoding(data, $.NSUTF8StringEncoding);
+    const raw: string = str.js;
     return JSON.parse(raw) as CacheEntry<T>;
   } catch {
-    // Missing file or corrupt JSON: treat as cache miss.
     return null;
   }
 }
 
 /**
- * Writes via a temp file + atomic `mv` so a concurrent reader (another
- * Alfred keystroke triggering a read while a background revalidate is
- * writing) never sees a half-written file.
+ * Writes via NSString's built-in atomic write (temp file + rename internally),
+ * replacing the manual shell cat+mv approach.
  */
 export function writeCacheFile<T>(key: string, entry: CacheEntry<T>): void {
+  ObjC.import('Foundation');
   const dir = cacheDir();
-  shell(`mkdir -p "${dir}"`);
-  const tmpPath = `${dir}/${key}.json.tmp`;
-  const finalPath = `${dir}/${key}.json`;
+  $.NSFileManager.defaultManager.createDirectoryAtPathWithIntermediateDirectoriesAttributesError(
+    $(dir), true, null, null
+  );
+  const path = `${dir}/${key}.json`;
   const json = JSON.stringify(entry);
-  shell(`cat > "${tmpPath}" << 'ALFRED_CACHE_EOF'\n${json}\nALFRED_CACHE_EOF`);
-  shell(`mv "${tmpPath}" "${finalPath}"`);
+  const nsStr = $.NSString.alloc.initWithUTF8String(json);
+  nsStr.writeToFile_atomically_encoding_error_($(path), true, $.NSUTF8StringEncoding, null);
 }
 
 function fileMtimeMs(filePath: string): number {
-  const epoch = shell(`stat -f %m "${filePath}" 2>/dev/null || echo 0`);
-  return Number(epoch) * 1000;
+  try {
+    ObjC.import('Foundation');
+    const attrs = $.NSFileManager.defaultManager.attributesOfItemAtPathError($(filePath), null);
+    const date = attrs.objectForKey('NSFileModificationDate');
+    return date.timeIntervalSince1970 * 1000;
+  } catch {
+    return 0;
+  }
 }
 
 function triggerRevalidateInBackground(key: string, revalidateScriptPath: string): void {

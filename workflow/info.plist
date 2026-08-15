@@ -37,10 +37,16 @@
 			<dict>
 				<key>alfredfiltersresults</key>
 				<false/>
+				<key>alfredfiltersresultsmatchmode</key>
+				<integer>0</integer>
+				<key>argumenttreatemptyqueryasnil</key>
+				<false/>
+				<key>argumenttrimmode</key>
+				<integer>0</integer>
 				<key>argumenttype</key>
 				<integer>1</integer>
 				<key>escaping</key>
-				<integer>102</integer>
+				<integer>68</integer>
 				<key>keyword</key>
 				<string>ctb</string>
 				<key>queuedelaycustom</key>
@@ -54,7 +60,7 @@
 				<key>runningsubtext</key>
 				<string>Searching tabs and bookmarks…</string>
 				<key>script</key>
-				<string>./main.js "$1"</string>
+				<string>/usr/bin/osascript -l JavaScript ./main.js "$1"</string>
 				<key>scriptargtype</key>
 				<integer>1</integer>
 				<key>scriptfile</key>
@@ -81,9 +87,9 @@
 				<key>concurrently</key>
 				<false/>
 				<key>escaping</key>
-				<integer>102</integer>
+				<integer>68</integer>
 				<key>script</key>
-				<string>./open.js "$1"</string>
+				<string>/usr/bin/osascript -l JavaScript ./open.js "$1"</string>
 				<key>scriptargtype</key>
 				<integer>1</integer>
 				<key>scriptfile</key>

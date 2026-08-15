@@ -13,14 +13,17 @@ export function getOpenTabs(): UnifiedItem[] {
     return items;
   }
 
-  const windows = chrome.windows();
-  for (let wIdx = 0; wIdx < windows.length; wIdx++) {
-    const tabs = windows[wIdx].tabs();
-    for (let tIdx = 0; tIdx < tabs.length; tIdx++) {
+  // Use JXA specifier-based bulk property access: one Apple Event per window
+  // instead of two per tab (title + url individually).
+  const numWindows: number = chrome.windows.length;
+  for (let wIdx = 0; wIdx < numWindows; wIdx++) {
+    const titles: string[] = chrome.windows[wIdx].tabs.title();
+    const urls: string[] = chrome.windows[wIdx].tabs.url();
+    for (let tIdx = 0; tIdx < titles.length; tIdx++) {
       items.push({
         type: 'tab',
-        title: tabs[tIdx].title(),
-        url: tabs[tIdx].url(),
+        title: titles[tIdx],
+        url: urls[tIdx],
         windowIndex: wIdx,
         tabIndex: tIdx,
       });
