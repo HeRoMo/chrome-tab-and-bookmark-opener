@@ -1,0 +1,26 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+jobs:
+  build-and-release:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm run package
+
+      - name: Release
+        uses: softprops/action-gh-release@v3
+        with:
+          files: dist/*.alfredworkflow
+          generate_release_notes: true

@@ -1,0 +1,9 @@
+node_modules/
+dist/
+workflow/main.js
+workflow/open.js
+workflow/revalidate.js
+*.alfredworkflow
+.DS_Store
+
+doc

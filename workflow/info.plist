@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>bundleid</key>
+	<string>com.heromo.chrome-tab-and-bookmark-opener</string>
+	<key>category</key>
+	<string>Productivity</string>
+	<key>connections</key>
+	<dict>
+		<key>C9F45E71-7A42-4872-AE42-2DD678975697</key>
+		<array>
+			<dict>
+				<key>destinationuid</key>
+				<string>696F0452-3CFF-494B-8662-6644081455F0</string>
+				<key>modifiers</key>
+				<integer>0</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+				<key>vitoclose</key>
+				<false/>
+			</dict>
+		</array>
+	</dict>
+	<key>createdby</key>
+	<string>HeRoMo</string>
+	<key>description</key>
+	<string>Search open Chrome tabs and bookmarks together, and jump to or open the selected one.</string>
+	<key>disabled</key>
+	<false/>
+	<key>name</key>
+	<string>Chrome tab and bookmark opener</string>
+	<key>objects</key>
+	<array>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>alfredfiltersresults</key>
+				<false/>
+				<key>argumenttype</key>
+				<integer>1</integer>
+				<key>escaping</key>
+				<integer>102</integer>
+				<key>keyword</key>
+				<string>ctb</string>
+				<key>queuedelaycustom</key>
+				<integer>3</integer>
+				<key>queuedelayimmediatelyinitially</key>
+				<true/>
+				<key>queuedelaymode</key>
+				<integer>0</integer>
+				<key>queuemode</key>
+				<integer>1</integer>
+				<key>runningsubtext</key>
+				<string>Searching tabs and bookmarks…</string>
+				<key>script</key>
+				<string>./main.js "$1"</string>
+				<key>scriptargtype</key>
+				<integer>1</integer>
+				<key>scriptfile</key>
+				<string></string>
+				<key>subtext</key>
+				<string>Search open tabs and bookmarks</string>
+				<key>title</key>
+				<string>Chrome tab and bookmark opener</string>
+				<key>type</key>
+				<integer>0</integer>
+				<key>withspace</key>
+				<true/>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.input.scriptfilter</string>
+			<key>uid</key>
+			<string>C9F45E71-7A42-4872-AE42-2DD678975697</string>
+			<key>version</key>
+			<integer>3</integer>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>concurrently</key>
+				<false/>
+				<key>escaping</key>
+				<integer>102</integer>
+				<key>script</key>
+				<string>./open.js "$1"</string>
+				<key>scriptargtype</key>
+				<integer>1</integer>
+				<key>scriptfile</key>
+				<string></string>
+				<key>type</key>
+				<integer>0</integer>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.action.script</string>
+			<key>uid</key>
+			<string>696F0452-3CFF-494B-8662-6644081455F0</string>
+			<key>version</key>
+			<integer>2</integer>
+		</dict>
+	</array>
+	<key>readme</key>
+	<string>Configuration:
+- chrome_profile (workflow variable, default "Default"): the Chrome profile
+  directory name under ~/Library/Application Support/Google/Chrome/.
+  Use "Profile 1", "Profile 2", etc. for non-default profiles.
+
+Requires: Google Chrome with "Allow JavaScript from Apple Events" enabled
+(View menu is not required; this is set once via Chrome &gt; View &gt; Developer,
+or automatically prompted on first run).</string>
+	<key>uidata</key>
+	<dict>
+		<key>696F0452-3CFF-494B-8662-6644081455F0</key>
+		<dict>
+			<key>xpos</key>
+			<real>380</real>
+			<key>ypos</key>
+			<real>90</real>
+		</dict>
+		<key>C9F45E71-7A42-4872-AE42-2DD678975697</key>
+		<dict>
+			<key>xpos</key>
+			<real>140</real>
+			<key>ypos</key>
+			<real>90</real>
+		</dict>
+	</dict>
+	<key>userconfigurationconfig</key>
+	<array>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>default</key>
+				<string>Default</string>
+				<key>placeholder</key>
+				<string>Default</string>
+				<key>required</key>
+				<false/>
+				<key>trim</key>
+				<true/>
+			</dict>
+			<key>description</key>
+			<string>Chrome profile directory name (e.g. "Default", "Profile 1")</string>
+			<key>type</key>
+			<string>textfield</string>
+			<key>variable</key>
+			<string>chrome_profile</string>
+		</dict>
+	</array>
+	<key>variables</key>
+	<dict>
+		<key>chrome_profile</key>
+		<string>Default</string>
+	</dict>
+	<key>variablesdontexport</key>
+	<array/>
+	<key>version</key>
+	<string>0.1.0</string>
+	<key>webaddress</key>
+	<string>https://github.com/heromo/chrome-tab-and-bookmark-opener</string>
+</dict>
+</plist>
