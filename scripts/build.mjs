@@ -1,4 +1,5 @@
 import { context, build } from 'esbuild';
+import { chmodSync } from 'fs';
 
 const watch = process.argv.includes('--watch');
 
@@ -26,11 +27,26 @@ const options = {
   logOverride: { 'unsupported-require-call': 'error' },
 };
 
+function makeExecutable() {
+  for (const name of ['main', 'open', 'revalidate']) {
+    chmodSync(`workflow/${name}.js`, 0o755);
+  }
+}
+
 if (watch) {
-  const ctx = await context(options);
+  const ctx = await context({
+    ...options,
+    plugins: [{
+      name: 'chmod',
+      setup(build) {
+        build.onEnd(() => makeExecutable());
+      },
+    }],
+  });
   await ctx.watch();
   console.log('Watching for changes... (Ctrl+C to stop)');
 } else {
   await build(options);
+  makeExecutable();
   console.log('Build complete: workflow/main.js, workflow/open.js, workflow/revalidate.js');
 }
