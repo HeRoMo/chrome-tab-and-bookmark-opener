@@ -8,6 +8,19 @@
 	<string>Productivity</string>
 	<key>connections</key>
 	<dict>
+		<key>B399D102-D493-4C9C-9BC8-62E42824F15C</key>
+		<array>
+			<dict>
+				<key>destinationuid</key>
+				<string>C9F45E71-7A42-4872-AE42-2DD678975697</string>
+				<key>modifiers</key>
+				<integer>0</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+				<key>vitoclose</key>
+				<false/>
+			</dict>
+		</array>
 		<key>C9F45E71-7A42-4872-AE42-2DD678975697</key>
 		<array>
 			<dict>
@@ -32,6 +45,29 @@
 	<string>Chrome tab and bookmark opener</string>
 	<key>objects</key>
 	<array>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>concurrently</key>
+				<false/>
+				<key>escaping</key>
+				<integer>68</integer>
+				<key>script</key>
+				<string>/usr/bin/osascript -l JavaScript ./open.js "$1"</string>
+				<key>scriptargtype</key>
+				<integer>1</integer>
+				<key>scriptfile</key>
+				<string></string>
+				<key>type</key>
+				<integer>0</integer>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.action.script</string>
+			<key>uid</key>
+			<string>696F0452-3CFF-494B-8662-6644081455F0</string>
+			<key>version</key>
+			<integer>2</integer>
+		</dict>
 		<dict>
 			<key>config</key>
 			<dict>
@@ -84,23 +120,31 @@
 		<dict>
 			<key>config</key>
 			<dict>
-				<key>concurrently</key>
+				<key>action</key>
+				<integer>0</integer>
+				<key>argument</key>
+				<integer>0</integer>
+				<key>focusedappvariable</key>
 				<false/>
-				<key>escaping</key>
-				<integer>68</integer>
-				<key>script</key>
-				<string>/usr/bin/osascript -l JavaScript ./open.js "$1"</string>
-				<key>scriptargtype</key>
-				<integer>1</integer>
-				<key>scriptfile</key>
+				<key>focusedappvariablename</key>
 				<string></string>
-				<key>type</key>
+				<key>hotkey</key>
+				<integer>0</integer>
+				<key>hotmod</key>
+				<integer>0</integer>
+				<key>hotstring</key>
+				<string></string>
+				<key>leftcursor</key>
+				<false/>
+				<key>modsmode</key>
+				<integer>2</integer>
+				<key>relatedAppsMode</key>
 				<integer>0</integer>
 			</dict>
 			<key>type</key>
-			<string>alfred.workflow.action.script</string>
+			<string>alfred.workflow.trigger.hotkey</string>
 			<key>uid</key>
-			<string>696F0452-3CFF-494B-8662-6644081455F0</string>
+			<string>B399D102-D493-4C9C-9BC8-62E42824F15C</string>
 			<key>version</key>
 			<integer>2</integer>
 		</dict>
@@ -119,14 +163,21 @@ or automatically prompted on first run).</string>
 		<key>696F0452-3CFF-494B-8662-6644081455F0</key>
 		<dict>
 			<key>xpos</key>
-			<real>380</real>
+			<real>640</real>
+			<key>ypos</key>
+			<real>90</real>
+		</dict>
+		<key>B399D102-D493-4C9C-9BC8-62E42824F15C</key>
+		<dict>
+			<key>xpos</key>
+			<real>125</real>
 			<key>ypos</key>
 			<real>90</real>
 		</dict>
 		<key>C9F45E71-7A42-4872-AE42-2DD678975697</key>
 		<dict>
 			<key>xpos</key>
-			<real>140</real>
+			<real>370</real>
 			<key>ypos</key>
 			<real>90</real>
 		</dict>
