@@ -1,5 +1,6 @@
 node_modules/
 dist/
+.test-build/
 workflow/main.js
 workflow/open.js
 workflow/revalidate.js
