@@ -9,6 +9,16 @@ export function shell(cmd: string): string {
   return app.doShellScript(cmd);
 }
 
+/**
+ * POSIX single-quote escaping for safe interpolation into a `shell()`
+ * command string. Inside single quotes, nothing is special except `'`
+ * itself, which this closes/escapes/reopens (`'\''`) — unlike double
+ * quotes, this also blocks `$`, backticks, and `\` expansion.
+ */
+export function shellQuote(value: string): string {
+  return `'${value.replace(/'/g, `'\\''`)}'`;
+}
+
 export function homeDir(): string {
   return getEnvVar('HOME');
 }
