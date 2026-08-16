@@ -1,5 +1,5 @@
 import type { CacheEntry } from '../types/item.js';
-import { shell, homeDir } from './shell.js';
+import { shell, shellQuote, homeDir } from './shell.js';
 
 const TTL_MS = 15 * 60 * 1000; // 15 minutes — see README for rationale
 
@@ -7,52 +7,74 @@ function cacheDir(): string {
   return `${homeDir()}/Library/Caches/com.alfred.chrome-tab-and-bookmark-opener`;
 }
 
+/**
+ * Cache keys become filenames (`<key>.json`), so beyond shell-quoting the
+ * resulting path, restrict the key itself to a strict allowlist — this is
+ * defense in depth against a key ever containing a path separator or
+ * shell metacharacter (today every call site passes a literal like
+ * `'bookmarks'`; a future multi-profile cache key derived from the
+ * user-configured `chrome_profile` variable should still be safe).
+ */
+function assertValidCacheKey(key: string): void {
+  if (!/^[A-Za-z0-9_-]{1,128}$/.test(key)) {
+    throw new Error(`Invalid cache key: ${key}`);
+  }
+}
+
 function readCacheFile<T>(key: string): CacheEntry<T> | null {
   try {
-    ObjC.import('Foundation');
+    assertValidCacheKey(key);
     const path = `${cacheDir()}/${key}.json`;
-    const data = $.NSData.dataWithContentsOfFile($(path));
-    if (!data || !data.length) return null;
-    const str = $.NSString.alloc.initWithDataEncoding(data, $.NSUTF8StringEncoding);
-    const raw: string = str.js;
+    const raw = shell(`cat ${shellQuote(path)} 2>/dev/null`);
+    if (!raw) return null;
     return JSON.parse(raw) as CacheEntry<T>;
   } catch {
+    // Missing file or corrupt JSON: treat as cache miss.
     return null;
   }
 }
 
 /**
- * Writes via NSString's built-in atomic write (temp file + rename internally),
- * replacing the manual shell cat+mv approach.
+ * Writes via a temp file + atomic `mv` so a concurrent reader (another
+ * Alfred keystroke triggering a read while a background revalidate is
+ * writing) never sees a half-written file.
+ *
+ * A prior version of this used the ObjC bridge (`$.NSFileManager`,
+ * `$.NSString...writeToFile...`) for the perceived subprocess-launch
+ * savings, but that bridge turned out to behave inconsistently across
+ * macOS versions — a `NSError**` out-param handled fine on one machine
+ * crashed with `-[NSNull count]: unrecognized selector` on another, and
+ * fixing that only surfaced a *different* failure elsewhere (a selector
+ * reported as "not a function") on a third. Shelling out is slower per
+ * call but has none of that version-dependent bridge behavior, so
+ * correctness wins here. See HANDOFF.md for the full incident.
  */
 export function writeCacheFile<T>(key: string, entry: CacheEntry<T>): void {
-  ObjC.import('Foundation');
+  assertValidCacheKey(key);
   const dir = cacheDir();
-  $.NSFileManager.defaultManager.createDirectoryAtPathWithIntermediateDirectoriesAttributesError(
-    $(dir), true, null, null
-  );
-  const path = `${dir}/${key}.json`;
+  shell(`mkdir -p ${shellQuote(dir)}`);
+  const tmpPath = `${dir}/${key}.json.tmp`;
+  const finalPath = `${dir}/${key}.json`;
   const json = JSON.stringify(entry);
-  const nsStr = $.NSString.alloc.initWithUTF8String(json);
-  nsStr.writeToFile_atomically_encoding_error_($(path), true, $.NSUTF8StringEncoding, null);
+  // The heredoc body itself doesn't need shellQuote: a single-quoted
+  // delimiter (`'ALFRED_CACHE_EOF'`) already disables all shell expansion
+  // ($…, `…`, \…) inside the body, and JSON.stringify's output is always
+  // a single line so it can't collide with the bare terminator line.
+  shell(`cat > ${shellQuote(tmpPath)} << 'ALFRED_CACHE_EOF'\n${json}\nALFRED_CACHE_EOF`);
+  shell(`mv ${shellQuote(tmpPath)} ${shellQuote(finalPath)}`);
 }
 
 function fileMtimeMs(filePath: string): number {
-  try {
-    ObjC.import('Foundation');
-    const attrs = $.NSFileManager.defaultManager.attributesOfItemAtPathError($(filePath), null);
-    const date = attrs.objectForKey('NSFileModificationDate');
-    return date.timeIntervalSince1970 * 1000;
-  } catch {
-    return 0;
-  }
+  const epoch = shell(`stat -f %m ${shellQuote(filePath)} 2>/dev/null || echo 0`);
+  return Number(epoch) * 1000;
 }
 
 function triggerRevalidateInBackground(key: string, revalidateScriptPath: string): void {
+  assertValidCacheKey(key);
   // nohup + `&` detaches the process so this Script Filter invocation
   // returns immediately without waiting for revalidation to finish.
   shell(
-    `nohup /usr/bin/osascript -l JavaScript "${revalidateScriptPath}" "${key}" > /dev/null 2>&1 &`
+    `nohup /usr/bin/osascript -l JavaScript ${shellQuote(revalidateScriptPath)} ${shellQuote(key)} > /dev/null 2>&1 &`
   );
 }
 
