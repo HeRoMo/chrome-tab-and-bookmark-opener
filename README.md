@@ -118,3 +118,8 @@ then locating the resulting folder.)
 ## License
 
 MIT — see [LICENSE](LICENSE).
+
+Icon assets (`workflow/icon.png`, `workflow/icons/*.png`) are derived from
+[Tabler Icons](https://tabler.io/icons) (MIT License) — see
+[workflow/NOTICE.md](workflow/NOTICE.md) for the full copyright and license
+notice, which is also bundled into the packaged `.alfredworkflow`.
