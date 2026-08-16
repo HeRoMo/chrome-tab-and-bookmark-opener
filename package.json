@@ -1,17 +1,19 @@
 {
   "name": "chrome-tab-and-bookmark-opener",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Alfred workflow: unified search & open for Chrome tabs and bookmarks",
   "private": true,
   "type": "module",
   "scripts": {
     "build": "node scripts/build.mjs",
     "typecheck": "tsc --noEmit",
+    "test": "node scripts/test.mjs",
     "watch": "node scripts/build.mjs --watch",
     "package": "npm run build && bash scripts/package.sh",
-    "clean": "rm -rf dist workflow/*.js"
+    "clean": "rm -rf dist workflow/*.js .test-build"
   },
   "devDependencies": {
+    "@types/node": "^26.2.0",
     "esbuild": "^0.28.0",
     "typescript": "^5.5.0"
   }

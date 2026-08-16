@@ -74,8 +74,13 @@ npm install
 npm run build      # compiles src/*.ts -> workflow/{main,open,revalidate}.js via esbuild
 npm run watch       # rebuild on change
 npm run typecheck   # tsc --noEmit only
+npm test            # runs src/**/*.test.ts (pure-logic modules only) via node:test
 npm run package      # build + zip workflow/ into dist/*.alfredworkflow
 ```
+
+Tests cover pure logic modules only (currently `src/lib/merge.ts`) — anything touching
+JXA/ObjC globals (`Application`, `$`, ...) can't run under plain Node and isn't tested
+this way.
 
 ### Architecture
 
