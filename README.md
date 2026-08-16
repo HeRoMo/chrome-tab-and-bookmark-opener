@@ -11,7 +11,7 @@ and jumps to (or opens) the selected one.
 
 ## Usage
 
-1. Invoke Alfred with the keyword `ctb` followed by your search term.
+1. Invoke Alfred with the keyword `to` followed by your search term.
 2. Results show both tabs (🔵) and bookmarks (🔖), matched against title and URL.
 3. Select a result:
    - **Tab** → the corresponding Chrome window/tab is brought to the front.
