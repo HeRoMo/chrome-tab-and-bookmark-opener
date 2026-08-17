@@ -1,6 +1,6 @@
 {
   "name": "chrome-tab-and-bookmark-opener",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Alfred workflow: unified search & open for Chrome tabs and bookmarks",
   "private": true,
   "type": "module",
