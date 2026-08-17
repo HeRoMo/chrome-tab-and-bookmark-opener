@@ -6,6 +6,9 @@ and jumps to (or opens) the selected one.
 - Open tabs are read live via Chrome's JXA dictionary.
 - Bookmarks are read from Chrome's `Bookmarks` JSON file and cached with a
   stale-while-revalidate strategy (see [Caching strategy](#caching-strategy)).
+  If the profile is linked to a Google account, Chrome may also keep an
+  `AccountBookmarks` file (same JSON format) alongside it — when present,
+  that file is used instead.
 - If a URL is both an open tab and a bookmark, the open tab takes priority
   (selecting it focuses the existing tab instead of opening a duplicate).
 
