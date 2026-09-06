@@ -1,13 +1,31 @@
 import type { UnifiedItem } from '../types/item.js';
 
 /**
+ * True if `tabUrl` is the same page as the bookmark, ignoring any query
+ * string or fragment the *bookmark* carries — a saved bookmark is usually
+ * the canonical URL, while the live tab often has extra params/hash
+ * appended (SPA routing, tracking params, etc.). Only the bookmark side is
+ * normalized; the match still requires the tab to start with that exact
+ * base, immediately followed by end-of-string, `?`, or `#`, so a bookmark
+ * for `/foo` cannot accidentally match a tab at `/foobar`.
+ */
+function bookmarkMatchesTab(bookmarkUrl: string, tabUrl: string): boolean {
+  const cutIndex = bookmarkUrl.search(/[?#]/);
+  const base = cutIndex === -1 ? bookmarkUrl : bookmarkUrl.slice(0, cutIndex);
+  if (!tabUrl.startsWith(base)) return false;
+  const rest = tabUrl.slice(base.length);
+  return rest === '' || rest.startsWith('?') || rest.startsWith('#');
+}
+
+/**
  * Merges tabs and bookmarks, preferring the open tab when the same URL
  * exists in both — opening a bookmark that's already open as a tab would
  * create a duplicate tab, which is rarely what the user wants.
  */
 export function mergeItems(tabs: UnifiedItem[], bookmarks: UnifiedItem[]): UnifiedItem[] {
-  const tabUrls = new Set(tabs.map((t) => t.url));
-  const dedupedBookmarks = bookmarks.filter((b) => !tabUrls.has(b.url));
+  const dedupedBookmarks = bookmarks.filter(
+    (b) => !tabs.some((t) => bookmarkMatchesTab(b.url, t.url))
+  );
   return [...tabs, ...dedupedBookmarks];
 }
 
@@ -47,7 +65,9 @@ export function searchItems(
   const result: UnifiedItem[] = [];
   for (const item of merged) {
     if (item.type === 'bookmark') {
-      const relatedTab = tabs.find((t) => t.url === item.url && !filteredTabUrls.has(t.url));
+      const relatedTab = tabs.find(
+        (t) => bookmarkMatchesTab(item.url, t.url) && !filteredTabUrls.has(t.url)
+      );
       if (relatedTab) result.push(relatedTab);
     }
     result.push(item);

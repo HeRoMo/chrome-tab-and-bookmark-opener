@@ -3,9 +3,17 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 
 // src/lib/merge.ts
+function bookmarkMatchesTab(bookmarkUrl, tabUrl) {
+  const cutIndex = bookmarkUrl.search(/[?#]/);
+  const base = cutIndex === -1 ? bookmarkUrl : bookmarkUrl.slice(0, cutIndex);
+  if (!tabUrl.startsWith(base)) return false;
+  const rest = tabUrl.slice(base.length);
+  return rest === "" || rest.startsWith("?") || rest.startsWith("#");
+}
 function mergeItems(tabs, bookmarks) {
-  const tabUrls = new Set(tabs.map((t) => t.url));
-  const dedupedBookmarks = bookmarks.filter((b) => !tabUrls.has(b.url));
+  const dedupedBookmarks = bookmarks.filter(
+    (b) => !tabs.some((t) => bookmarkMatchesTab(b.url, t.url))
+  );
   return [...tabs, ...dedupedBookmarks];
 }
 function filterByQuery(items, query) {
@@ -23,7 +31,9 @@ function searchItems(tabs, bookmarks, query) {
   const result = [];
   for (const item of merged) {
     if (item.type === "bookmark") {
-      const relatedTab = tabs.find((t) => t.url === item.url && !filteredTabUrls.has(t.url));
+      const relatedTab = tabs.find(
+        (t) => bookmarkMatchesTab(item.url, t.url) && !filteredTabUrls.has(t.url)
+      );
       if (relatedTab) result.push(relatedTab);
     }
     result.push(item);
@@ -92,3 +102,22 @@ test("searchItems: an unrelated open tab does not leak into a bookmark-only matc
   const result = searchItems(tabs, bookmarks, "gas");
   assert.deepEqual(result, bookmarks);
 });
+test("mergeItems: dedupes a bookmark against a tab whose URL only differs by query string or hash", () => {
+  const tabs = [tab("Apps Script", "https://script.google.com/home?pli=1#projects/xyz")];
+  const bookmarks = [bookmark("gas", "https://script.google.com/home")];
+  assert.deepEqual(mergeItems(tabs, bookmarks), tabs);
+});
+test("mergeItems: does not dedupe a bookmark against a tab whose path merely shares a prefix", () => {
+  const tabs = [tab("Foobar", "https://example.com/foobar")];
+  const bookmarks = [bookmark("Foo", "https://example.com/foo")];
+  assert.deepEqual(mergeItems(tabs, bookmarks), [...tabs, ...bookmarks]);
+});
+test(
+  "searchItems: surfaces the open tab next to a title-matched bookmark even when the tab URL carries extra query params/hash the bookmark does not",
+  () => {
+    const tabs = [tab("Apps Script", "https://script.google.com/home?pli=1#projects/xyz")];
+    const bookmarks = [bookmark("gas", "https://script.google.com/home")];
+    const result = searchItems(tabs, bookmarks, "gas");
+    assert.deepEqual(result, [tabs[0], bookmarks[0]]);
+  }
+);
